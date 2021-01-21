@@ -1,4 +1,4 @@
-using TextAnalysis, JSON, MultivariateStats, Clustering
+using TextAnalysis, JSON #, MultivariateStats, Clustering
 using DataFrames
 
 # Read in the text file
@@ -21,7 +21,9 @@ isaiahtext = isaiahjson["text"]
 blockstring = ""
 #for chapter in 1:length(isaiahtext)
 for chapter in 24:27
-    for verse in 1:length(chapter)
+    for verse in 1:length(isaiahtext[chapter])
+        # print(string(chapter,":",verse," "))
+        # print(isaiahtext[chapter][verse])
         global blockstring = string(blockstring," ",isaiahtext[chapter][verse])
     end
 end
@@ -36,7 +38,6 @@ tokens(strgdc)
 prepare!(strgdc, strip_punctuation)
 prepare!(strgdc, strip_stopwords)
 prepare!(strgdc, strip_case)
-
 stem!(strgdc)
 
 tokens(strgdc) # Now see it after the cleaning
