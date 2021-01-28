@@ -1,6 +1,7 @@
-#
-# https://raw.githubusercontent.com/Sefaria/Sefaria-Export/master/json/Tanakh/Prophets/Isaiah/English/The%20Holy%20Scriptures%20A%20New%20Translation%20JPS%201917.json
-#
+# Chaim Kesler
+# Wed Jan 27 21:42:44 EST 2021
+# https://chaimkesler.shinyapps.io/hadar_presentation/
+# Live Production URL
 
 library(cluster)  # Generate the clusters
 library(shinydashboard)  # Make it look better
@@ -21,8 +22,9 @@ ui <- dashboardPage(
     dashboardSidebar(
         sidebarMenu(
             menuItem("Exploration", tabName = "exploration", icon = icon("compass")),
+            menuItem("References", tabName = "reference", icon = icon("book")),
             menuItem("Clusters",
-                     menuSubItem("Isaish 24-27", tabName = "cluster"),
+                     menuSubItem("Isaiah 24-27", tabName = "cluster"),
                      icon = icon("project-diagram"),
                      sliderInput("clusters",
                                  "Number of clusters:",
@@ -30,8 +32,7 @@ ui <- dashboardPage(
                                  max = 7,
                                  value = 3)
                         )
-                     ),
-            menuItem("References", tabName = "reference", icon = icon("book"))
+                     )
     ),
 
         # Show a plot of the generated distribution
@@ -44,7 +45,7 @@ ui <- dashboardPage(
                         h4(textBody$overview),
                         HTML("<p><a href='https://github.com/ChaimKesler/isaiah_topics/tree/main/hadar_presentation'>Github link to this presentation</a></p>"),
                         hr(),
-                        h2("Example Text: Isaish 24-27"),
+                        h2("Example Text: Isaiah 24-27"),
                         hr(),
                         h4("Top Words by Chapter"),
                         plotOutput("topWords"),
