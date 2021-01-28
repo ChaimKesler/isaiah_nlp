@@ -80,8 +80,8 @@ ui <- dashboardPage(
                         HTML("<p><a href='https://github.com/Sefaria/Sefaria-Export'>Bible Text: Full Mongo Database from Sefaria</a></p"),
                         hr(),
                         hr("Related Academic Articles"),
-                        HTML("<p><a href='https://aaai.org/ocs/index.php/FLAIRS/FLAIRS17/paper/view/15541)'>What’s Wrong with Hebrew NLP? And How to Make it Right</a></p>"), 
-                        HTML("<p><a href='https://www.aclweb.org/anthology/D19-3044.pdf'>Can Natural Language Processing Help Identify the Author(s) of the Book of Isaiah?</a></p>")
+                        HTML("<p><a href='https://aaai.org/ocs/index.php/FLAIRS/FLAIRS17/paper/view/15541)'> Can Natural Language Processing Help Identify the Author(s) of the Book of Isaiah?</a></p>"), 
+                        HTML("<p><a href='https://www.aclweb.org/anthology/D19-3044.pdf'>What’s Wrong with Hebrew NLP? And How to Make it Right</a></p>")
                         )
             )
         )
