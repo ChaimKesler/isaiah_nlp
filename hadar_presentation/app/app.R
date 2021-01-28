@@ -42,6 +42,7 @@ ui <- dashboardPage(
                         h4(textBody$byline),
                         hr(),
                         h4(textBody$overview),
+                        HTML("<p><a href='https://github.com/ChaimKesler/isaiah_topics/tree/main/hadar_presentation'>Github link to this presentation</a></p>"),
                         hr(),
                         h2("Example Text: Isaish 24-27"),
                         hr(),
