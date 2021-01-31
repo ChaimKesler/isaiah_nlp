@@ -6,6 +6,7 @@
 library(cluster)  # Generate the clusters
 library(shinydashboard)  # Make it look better
 library(tidyverse)
+library(crayon)
 
 load(".RData")  # Pull in the source data
 source("textBlocks.R")
@@ -44,6 +45,7 @@ ui <- dashboardPage(
                         hr(),
                         h4(textBody$overview),
                         HTML("<p><a href='https://github.com/ChaimKesler/isaiah_topics/tree/main/hadar_presentation'>Github link to this presentation</a></p>"),
+                        HTML("<p><a href='https://rpubs.com/chaimkesler/719417'>Presentation notebook available here</a></p>"),
                         hr(),
                         h2("Example Text: Isaiah 24-27"),
                         hr(),
@@ -75,8 +77,12 @@ ui <- dashboardPage(
                         HTML("<p><a href='https://www.sefaria.org/Isaiah.24?lang=bi'>Seferia Hebrew/English 24</a></p>"),
                         hr("NLP Programming Documentation"),
                         HTML("<p><a href='https://www.tidytextmining.com/'>R: Tidy Text R Package</a></p>"),
-                        HTML("<p><a href='https://www.tidytextmining.com/preface.html'>R: Text Mining Book</a></p>"),
-                        HTML("<p><a href='https://smltar.com/'>R: Supervised Machine Learning for Text Analysis in R</a></p>"),
+                        HTML("<p><a href='https://www.tidytextmining.com/preface.html'>R: Text Mining Book (Online Book)</a></p>"),
+                        HTML("<p><a href='https://smltar.com/'>R: Supervised Machine Learning for Text Analysis in R (Online Book)</a></p>"),
+                        HTML("<p><a href='https://julialang.org'>Julia: Julia Language Overview</a></p>"),
+                        HTML("<p><a href='https://juliahub.com/docs/TextAnalysis/5Mwet/0.7.2/'>Julia: Julia NLP Core Library</a></p>"),
+                        HTML("<p><a href='https://www.nltk.org/'>Python: Python NLP Core Library (NLTK)</a></p>"),
+                        HTML("<p><a href='http://www.nltk.org/book/'>Python: NLP with Python (Online Book)</a></p>"),
                         HTML("<p><a href='https://github.com/Sefaria/Sefaria-Export'>Bible Text: Full Mongo Database from Sefaria</a></p"),
                         hr(),
                         hr("Related Academic Articles"),
@@ -128,6 +134,7 @@ server <- function(input, output) {
         df <- df[,order(names(df))]
         plot <- with(plotdf, pairs(df, col=c(1:input$clusters)[model$cluster]))
         plot})
+
 }
 
 # Run the application 

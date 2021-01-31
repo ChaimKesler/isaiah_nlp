@@ -1,0 +1,146 @@
+---
+title: "Isaiah 24-27 Simple NLP Code Demonstration"
+output: html_notebook
+---
+
+```{r, warning=FALSE, echo=FALSE}
+library(tidyverse)
+library(tidytext)
+library(tm)
+library(ggplot2)
+library(cluster)
+
+rm(list = ls())
+#load(".RData")
+
+```
+
+A quick walk through of NLP with R.
+
+The first step is just getting the text into our scope for analysis:
+
+```{r warning=FALSE, echo=FALSE}
+# Import and reshape the data - working with JSON isn't easy
+jsonfile <- jsonlite::fromJSON("isaiah.json")
+
+chapters <- 24:27
+
+tb_text <- jsonfile$text[chapters] %>% tibble()
+names(tb_text) <- "text"
+
+head(jsonfile)
+```
+
+
+The JSON file isn't very friendly so we want to convert it to a dataframe in R:
+
+```{r warning=FALSE, echo=FALSE}
+
+clean_unlist <-
+  function(df, column, i, chap_list) {
+    df <- tibble(df[i, column] %>% unlist())
+    names(df) <- "text"
+    df$chapter <- rep(chap_list[i], nrow(df))
+    df$verse <- 1:nrow(df)
+    df
+  }
+
+masterdf <- NULL
+for(i in 1:nrow(tb_text)){  # Yes, I know this isn't the most "R" way to do this
+  masterdf <- bind_rows(masterdf, clean_unlist(tb_text, "text", i, chapters))
+}
+
+head(masterdf)
+
+```
+
+We need to clean and restructure the data so that we can do analysis on it. The initial step is to unnest the words from the text and clean the words:
+
+```{r  warning=FALSE, echo=FALSE}
+# Let's look a word count
+
+analysisdf <- masterdf  %>% unnest_tokens(word, text)
+
+full_text <- as_tibble(analysisdf$word)
+
+names(full_text) <- "name"
+
+head(analysisdf)
+
+```
+
+We may want to remove words with limited or no meaningful signal (stop words) the full list is [available here at this link](http://www.lextek.com/manuals/onix/stopwords1.html).
+
+```{r warning=FALSE, echo=FALSE}
+# Remove stop words which provide limited meaning
+data(stop_words)
+analysisdf <- analysisdf %>% anti_join(stop_words)
+
+custom_stop <- tibble(c("and", "behold", "hath", "thee", "thou", "thy", "thereof", "ye", "yea"))
+names(custom_stop) <- "word"
+custom_df <- analysisdf %>% anti_join(custom_stop)
+```
+
+We can now look the top words and frequency by chapter location:
+
+```{r warning=FALSE, echo=FALSE}
+plotdf_custom <-
+  custom_df %>% 
+    group_by(chapter) %>%
+    count(word, sort = TRUE)
+
+total_words <- plotdf_custom %>% 
+  group_by(chapter) %>% 
+  summarize(total = sum(n))
+
+plotdf_custom <- left_join(plotdf_custom, total_words)
+
+# Top Words
+plotdf_custom %>%
+  filter(n > 2) %>%
+  ggplot(aes(n, word, fill=as.factor(chapter))) + 
+  geom_bar(position="stack",stat = "identity") + 
+  labs(y = NULL) +
+  scale_fill_brewer(palette="Set2")
+
+# Frequency
+ggplot(plotdf_custom, aes(n/total, fill = chapter)) +
+  geom_histogram(show.legend = FALSE, bins = 10) +
+  facet_wrap(~chapter, ncol = 2)
+
+```
+
+Now we can run a [K-Means cluster analysis]("https://uc-r.github.io/kmeans_clustering") (one of many tools that we could use)
+```{r warning=FALSE, echo=FALSE }
+# With Custom Stop
+dtm_df_custom <- plotdf_custom %>% cast_dtm(chapter, word, n)
+dtm_df_custom.subset <- removeSparseTerms(dtm_df_custom, 0.4)
+kmeans.data_custom <- as.matrix(t(dtm_df_custom.subset))
+
+model <- kmeans(kmeans.data_custom, 5)
+clusplot(kmeans.data_custom, model$cluster, color=TRUE, shade=TRUE,
+         labels=2, lines=0)
+with(plotdf_custom, pairs(kmeans.data_custom, col=c(1:5)[model$cluster]))
+
+# Try to color the text
+
+# individuate words
+clusterTB<-enframe(model$cluster)
+full_text <- full_text %>% left_join(y=clusterTB, by="name")
+#full_text[is.na(full_text$value),]$value <- 0
+full_text$place <- 1:nrow(full_text)
+
+chapterLength<-lapply(24:27, function(i){nrow(masterdf %>% filter(chapter == i) %>% unnest_tokens(word, text))})
+
+full_text %>%
+  ggplot(aes(place, value, color=as.factor(value))) +
+  geom_point() +
+  geom_vline(xintercept = chapterLength[[1]]) +
+  geom_vline(xintercept = chapterLength[[1]]+chapterLength[[2]]) +
+  geom_vline(xintercept = chapterLength[[1]]+chapterLength[[2]]+chapterLength[[3]]) +
+  labs(x="Word Position",
+       y="Cluster Assignment",
+       title= "Clusters and Word Proximity by Chapter") +
+  theme(legend.position = "none")
+
+```
